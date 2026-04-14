@@ -10,7 +10,8 @@
 <meta name="theme-color" content="#1a1a1a">
 <title>安全パトロールチェックシート</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:rgba(0,0,0,0.1)}
+button{cursor:pointer;touch-action:manipulation;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 :root{
   --black:#1a1a1a;--white:#ffffff;--bg:#f0f0ec;--card:#ffffff;
   --border:#ddddd8;--border-light:#eeede8;
@@ -97,7 +98,8 @@ body{font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',Aria
 .tag-grid{display:flex;flex-wrap:wrap;gap:6px}
 .tag-btn{padding:8px 14px;border-radius:20px;border:1.5px solid var(--border);
   background:var(--label-bg);color:#666;cursor:pointer;font-size:13px;
-  font-family:inherit;font-weight:600;min-height:38px;transition:all .12s}
+  font-family:inherit;font-weight:600;min-height:44px;transition:all .12s;
+  touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .tag-btn.active{background:var(--black);border-color:var(--black);color:#fff}
 .filter-row{display:flex;flex-wrap:wrap;gap:8px;padding:10px 12px}
 .filter-sel{flex:1;min-width:140px;padding:9px 12px;border-radius:var(--radius-sm);
@@ -622,7 +624,9 @@ function init(){
   Object.keys(MAJOR_MINOR).forEach(m=>{
     const b=document.createElement('button');
     b.className='tag-btn'; b.textContent=m; b.dataset.major=m;
-    b.onclick=()=>toggleMajor(m,b); mc.appendChild(b);
+    b.addEventListener('click',()=>toggleMajor(m,b));
+    b.addEventListener('touchend',e=>{e.preventDefault();toggleMajor(m,b);});
+    mc.appendChild(b);
   });
   // 事故分類
   const af=document.getElementById('f-accident');
@@ -645,7 +649,7 @@ function renderProjectList(){
   el.innerHTML=app.projects.map(p=>{
     const isCur=p.id===app.currentProjectId;
     const ngCount=Object.values(p.itemState||{}).filter(s=>s.status==='ng').length;
-    return `<div class="proj-item${isCur?' current':''}" onclick="switchProject('${p.id}')">
+    return `<div class="proj-item${isCur?' current':''}" onclick="switchProject('${p.id}')" ontouchend="event.preventDefault();switchProject('${p.id}')">
       <div class="proj-info">
         <div class="proj-name">${escHtml(p.info?.name||'（工事名未入力）')}</div>
         <div class="proj-meta">${escHtml(p.info?.loc||'')} ${p.info?.date||''}</div>
@@ -762,7 +766,9 @@ function updateMinorTags(){
     const b=document.createElement('button');
     b.className='tag-btn'+(selMinors.has(mn)?' active':'');
     b.textContent=mn; b.dataset.minor=mn;
-    b.onclick=()=>toggleMinor(mn,b); c.appendChild(b);
+    b.addEventListener('click',()=>toggleMinor(mn,b));
+    b.addEventListener('touchend',e=>{e.preventDefault();toggleMinor(mn,b);});
+    c.appendChild(b);
   });
 }
 function toggleMinor(mn,btn){
